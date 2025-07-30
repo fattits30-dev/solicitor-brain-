@@ -36,3 +36,17 @@ pytest tests/                       # unit tests
 python scripts/red_team_test.py     # hallucination red‑team
 ./scripts/compliance_checker.sh     # SRA compliance run
 
+
+## Directory map
+- `/backend`   – FastAPI service layer
+- `/frontend`  – Next.js 15 SPA
+- `/examples`  – demos
+- `/scripts`   – helper scripts
+- `/assets`    – static files
+- `/docs`      – docs & policies
+- `/deploy`    – infra manifests
+
+## Guard‑rails
+1. Before committing, run `pytest tests/`, `ruff backend/ frontend/`, `python -m mypy backend/`, `npm run --prefix frontend build`.
+2. If the VS Code Problems panel isn’t empty, fix everything first.
+3. Abort any patch > 200 LOC and split it.
