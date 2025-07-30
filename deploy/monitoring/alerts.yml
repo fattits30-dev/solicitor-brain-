@@ -1,0 +1,90 @@
+groups:
+  - name: solicitor_brain_alerts
+    interval: 30s
+    rules:
+      # High latency alert
+      - alert: HighAPILatency
+        expr: histogram_quantile(0.95, rate(solicitor_brain_request_duration_seconds_bucket[5m])) > 6
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High API latency detected"
+          description: "95th percentile latency is {{ $value }}s (threshold: 6s)"
+
+      # Disk usage alert
+      - alert: HighDiskUsage
+        expr: (node_filesystem_avail_bytes{mountpoint="/data"} / node_filesystem_size_bytes{mountpoint="/data"}) * 100 < 20
+        for: 10m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High disk usage on /data"
+          description: "Disk usage is {{ $value }}% full"
+
+      # GPU temperature alert
+      - alert: HighGPUTemperature
+        expr: solicitor_brain_gpu_temperature_celsius > 80
+        for: 5m
+        labels:
+          severity: critical
+        annotations:
+          summary: "GPU temperature too high"
+          description: "GPU temperature is {{ $value }}°C (threshold: 80°C)"
+
+      # Citation rejection spike
+      - alert: CitationRejectionSpike
+        expr: rate(solicitor_brain_citation_checks_total{success="false"}[5m]) > 0.1
+        for: 5m
+        labels:
+          severity: critical
+        annotations:
+          summary: "High rate of citation rejections"
+          description: "Citation rejection rate: {{ $value }} per second"
+
+      # Hallucination detection
+      - alert: HallucinationDetected
+        expr: increase(solicitor_brain_hallucination_blocks_total[1h]) > 0
+        labels:
+          severity: critical
+        annotations:
+          summary: "Hallucination blocked"
+          description: "{{ $value }} hallucination(s) blocked in the last hour"
+
+      # Service down alerts
+      - alert: BackendAPIDown
+        expr: up{job="solicitor-brain-api"} == 0
+        for: 2m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Backend API is down"
+          description: "The Solicitor Brain API has been down for more than 2 minutes"
+
+      # KPI alerts
+      - alert: AutoFilePrecisionLow
+        expr: solicitor_brain_auto_file_precision < 95
+        for: 10m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Auto-file precision below target"
+          description: "Auto-file precision is {{ $value }}% (target: ≥95%)"
+
+      - alert: EmailCaseMatchLow
+        expr: solicitor_brain_email_case_match < 90
+        for: 10m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Email-to-case matching below target"
+          description: "Email-to-case matching is {{ $value }}% (target: ≥90%)"
+
+      - alert: FactCheckPrecisionLow
+        expr: solicitor_brain_fact_check_precision < 97
+        for: 10m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Fact-check precision below target"
+          description: "Fact-check precision is {{ $value }}% (target: ≥97%)"
