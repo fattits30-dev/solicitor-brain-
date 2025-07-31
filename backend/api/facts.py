@@ -1,13 +1,20 @@
-from fastapi import APIRouter, Depends, HTTPException, BackgroundTasks
-from typing import List, Optional, Dict, Any
+from typing import Any
 from uuid import UUID
+
+from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from backend.utils.database import get_db
-from backend.services.fact_service import FactService
+from backend.schemas.facts import (
+    FactBulkExtract,
+    FactCreate,
+    FactResponse,
+    FactSignOff,
+    FactVerification,
+)
 from backend.services.auth import get_default_user
-from backend.schemas.facts import FactCreate, FactResponse, FactVerification, FactSignOff, FactBulkExtract
+from backend.services.fact_service import FactService
 from backend.utils.compliance import validate_sign_off
+from backend.utils.database import get_db
 
 router = APIRouter()
 
@@ -37,15 +44,15 @@ async def create_fact(case_id: UUID, fact_data: FactCreate, db: AsyncSession = D
         raise HTTPException(status_code=400, detail=str(e))
 
 
-@router.get("/cases/{case_id}/facts", response_model=List[FactResponse])
+@router.get("/cases/{case_id}/facts", response_model=list[FactResponse])
 async def get_case_facts(
     case_id: UUID,
-    fact_type: Optional[str] = None,
-    verification_status: Optional[str] = None,
-    importance: Optional[str] = None,
+    fact_type: str | None = None,
+    verification_status: str | None = None,
+    importance: str | None = None,
     include_rejected: bool = False,
     db: AsyncSession = Depends(get_db),
-) -> List[FactResponse]:
+) -> list[FactResponse]:
     """Get all facts for a case with filtering"""
     service = FactService(db)
 
@@ -100,8 +107,8 @@ async def sign_off_fact(fact_id: UUID, sign_off: FactSignOff, db: AsyncSession =
         raise HTTPException(status_code=404, detail=str(e))
 
 
-@router.get("/cases/{case_id}/facts/critical-dates", response_model=List[FactResponse])
-async def get_critical_dates(case_id: UUID, db: AsyncSession = Depends(get_db)) -> List[FactResponse]:
+@router.get("/cases/{case_id}/facts/critical-dates", response_model=list[FactResponse])
+async def get_critical_dates(case_id: UUID, db: AsyncSession = Depends(get_db)) -> list[FactResponse]:
     """Get all critical dates for a case"""
     service = FactService(db)
     dates = await service.get_critical_dates(case_id)
@@ -109,15 +116,25 @@ async def get_critical_dates(case_id: UUID, db: AsyncSession = Depends(get_db)) 
 
 
 @router.get("/cases/{case_id}/facts/conflicts")
-async def find_conflicting_facts(case_id: UUID, db: AsyncSession = Depends(get_db)) -> List[Dict[str, Dict[str, Any]]]:
+async def find_conflicting_facts(case_id: UUID, db: AsyncSession = Depends(get_db)) -> list[dict[str, dict[str, Any]]]:
     """Find potentially conflicting facts in a case"""
     service = FactService(db)
     conflicts = await service.find_conflicting_facts(case_id)
 
     return [
         {
-            "fact1": {"id": f1.id, "text": f1.fact_text, "type": f1.fact_type, "source": f1.source_page},
-            "fact2": {"id": f2.id, "text": f2.fact_text, "type": f2.fact_type, "source": f2.source_page},
+            "fact1": {
+                "id": f1.id,
+                "text": f1.fact_text,
+                "type": f1.fact_type,
+                "source": f1.source_page,
+            },
+            "fact2": {
+                "id": f2.id,
+                "text": f2.fact_text,
+                "type": f2.fact_type,
+                "source": f2.source_page,
+            },
         }
         for f1, f2 in conflicts
     ]
@@ -130,7 +147,7 @@ async def bulk_extract_facts(
     extraction_data: FactBulkExtract,
     background_tasks: BackgroundTasks,
     db: AsyncSession = Depends(get_db),
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     """Extract multiple facts from a document"""
     service = FactService(db)
 

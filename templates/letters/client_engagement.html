@@ -1,0 +1,62 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        body { font-family: Arial, sans-serif; line-height: 1.6; }
+        .header { margin-bottom: 30px; }
+        .date { text-align: right; margin-bottom: 20px; }
+        .recipient { margin-bottom: 20px; }
+        .content { margin: 20px 0; }
+        .signature { margin-top: 50px; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>{{ firm_name }}</h1>
+        <p>{{ firm_address }}</p>
+        <p>Tel: {{ firm_phone }} | Email: {{ firm_email }}</p>
+    </div>
+    
+    <div class="date">{{ date }}</div>
+    
+    <div class="recipient">
+        <p>{{ client_name }}<br>
+        {{ client_address }}</p>
+    </div>
+    
+    <p>Dear {{ client_name }},</p>
+    
+    <h2>Engagement Letter - {{ matter_description }}</h2>
+    
+    <div class="content">
+        <p>Thank you for instructing {{ firm_name }} to act on your behalf in relation to {{ matter_description }}.</p>
+        
+        <p>I am writing to confirm the basis on which we will act for you and to set out our terms of engagement.</p>
+        
+        <h3>Scope of Work</h3>
+        <p>{{ scope_of_work }}</p>
+        
+        <h3>Fee Arrangement</h3>
+        <p>Our fees for this matter will be charged as follows:</p>
+        <p>{{ fee_arrangement }}</p>
+        
+        <h3>Estimated Costs</h3>
+        <p>{{ estimated_costs }}</p>
+        
+        <h3>Timescale</h3>
+        <p>{{ estimated_timeline }}</p>
+        
+        <p>Please sign and return one copy of this letter to confirm your agreement to these terms.</p>
+    </div>
+    
+    <div class="signature">
+        <p>Yours sincerely,</p>
+        <br><br>
+        <p>{{ solicitor_name }}<br>
+        {{ solicitor_title }}<br>
+        {{ firm_name }}</p>
+    </div>
+</body>
+</html>
+            

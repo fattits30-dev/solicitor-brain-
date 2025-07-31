@@ -1,0 +1,12 @@
+{
+  "include": ["backend"],
+  "exclude": ["**/node_modules", "**/__pycache__", "venv"],
+  "reportMissingImports": true,
+  "reportMissingTypeStubs": false,
+  "pythonVersion": "3.11",
+  "pythonPlatform": "Linux",
+  "typeCheckingMode": "strict",
+  "useLibraryCodeForTypes": true,
+  "venvPath": ".",
+  "venv": "venv"
+}

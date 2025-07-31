@@ -1,0 +1,67 @@
+[
+  {
+    "id": "bd8b0f28-a64f-49e3-b91f-5e419b755059",
+    "title": "Smith v. Johnson Property Dispute",
+    "caseNumber": "CV-2025-7420",
+    "clientName": "John Smith",
+    "caseType": "civil",
+    "status": "active",
+    "priority": "high",
+    "description": "Property boundary dispute between neighbors regarding fence placement",
+    "nextHearing": "2025-08-30T19:20:08.780182+00:00",
+    "createdAt": "2025-06-01T19:20:08.780213+00:00",
+    "updatedAt": "2025-07-26T19:20:08.780217+00:00"
+  },
+  {
+    "id": "b943f30f-b73e-48ed-b013-893fae3f5a74",
+    "title": "R v. Williams (Theft)",
+    "caseNumber": "CR-2025-9964",
+    "clientName": "David Williams",
+    "caseType": "criminal",
+    "status": "active",
+    "priority": "urgent",
+    "description": "Alleged theft from retail store, client maintains innocence",
+    "nextHearing": "2025-08-07T19:20:08.780233+00:00",
+    "createdAt": "2025-07-01T19:20:08.780237+00:00",
+    "updatedAt": "2025-07-30T19:20:08.780241+00:00"
+  },
+  {
+    "id": "6d337942-64f1-4a9a-b3af-4776e18c837a",
+    "title": "Brown Divorce Proceedings",
+    "caseNumber": "FM-2025-7413",
+    "clientName": "Sarah Brown",
+    "caseType": "family",
+    "status": "pending",
+    "priority": "medium",
+    "description": "Divorce proceedings with child custody arrangements",
+    "nextHearing": "2025-08-14T19:20:08.780253+00:00",
+    "createdAt": "2025-05-02T19:20:08.780256+00:00",
+    "updatedAt": "2025-07-28T19:20:08.780259+00:00"
+  },
+  {
+    "id": "9e5df894-184e-452d-a7a7-bf8ea6eec29b",
+    "title": "TechCorp Ltd Contract Review",
+    "caseNumber": "CO-2025-5035",
+    "clientName": "TechCorp Ltd",
+    "caseType": "corporate",
+    "status": "active",
+    "priority": "medium",
+    "description": "Review and negotiation of software licensing agreement",
+    "nextHearing": null,
+    "createdAt": "2025-07-16T19:20:08.780277+00:00",
+    "updatedAt": "2025-07-29T19:20:08.780280+00:00"
+  },
+  {
+    "id": "c78f371e-a634-437b-9035-79625c1d45a2",
+    "title": "Estate of Margaret Thompson",
+    "caseNumber": "PR-2025-4318",
+    "clientName": "Thompson Family",
+    "caseType": "other",
+    "status": "active",
+    "priority": "low",
+    "description": "Probate and estate administration",
+    "nextHearing": "2025-09-14T19:20:08.780292+00:00",
+    "createdAt": "2025-06-16T19:20:08.780295+00:00",
+    "updatedAt": "2025-07-21T19:20:08.780298+00:00"
+  }
+]

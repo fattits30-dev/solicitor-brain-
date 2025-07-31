@@ -1,0 +1,309 @@
+{
+  "emails": [
+    {
+      "id": "96e1a601-a0af-4e02-9490-fcd18386505d",
+      "folder": "drafts",
+      "from": "john.smith@opposingcounsel.com",
+      "to": [
+        "solicitor@lawfirm.co.uk"
+      ],
+      "subject": "Re: Smith v. Johnson Property Dispute - Update",
+      "body": "Dear Solicitor,\n\nI wanted to update you on the Smith v. Johnson Property Dispute matter.\n\nPlease let me know if you need any additional information.\n\nBest regards,\nJohn Smith",
+      "date": "2025-07-28T19:20:08.780686+00:00",
+      "is_read": false,
+      "is_flagged": true,
+      "has_attachments": false,
+      "attachments": [
+        "document.pdf"
+      ],
+      "case_id": "bd8b0f28-a64f-49e3-b91f-5e419b755059",
+      "tags": [
+        "civil"
+      ]
+    },
+    {
+      "id": "d8322ce3-2e11-4f0e-b242-03121656752e",
+      "folder": "drafts",
+      "from": "john.smith@court.gov.uk",
+      "to": [
+        "solicitor@lawfirm.co.uk"
+      ],
+      "subject": "Re: Smith v. Johnson Property Dispute - Update",
+      "body": "Dear Solicitor,\n\nI wanted to update you on the Smith v. Johnson Property Dispute matter.\n\nPlease let me know if you need any additional information.\n\nBest regards,\nJohn Smith",
+      "date": "2025-07-17T19:20:08.780703+00:00",
+      "is_read": false,
+      "is_flagged": true,
+      "has_attachments": false,
+      "attachments": [],
+      "case_id": "bd8b0f28-a64f-49e3-b91f-5e419b755059",
+      "tags": [
+        "civil"
+      ]
+    },
+    {
+      "id": "33dc577d-cc49-4bb5-b68d-3c1d273b9d0c",
+      "folder": "inbox",
+      "from": "john.smith@client.com",
+      "to": [
+        "solicitor@lawfirm.co.uk"
+      ],
+      "subject": "Re: Smith v. Johnson Property Dispute - Update",
+      "body": "Dear Solicitor,\n\nI wanted to update you on the Smith v. Johnson Property Dispute matter.\n\nPlease let me know if you need any additional information.\n\nBest regards,\nJohn Smith",
+      "date": "2025-07-28T19:20:08.780717+00:00",
+      "is_read": false,
+      "is_flagged": false,
+      "has_attachments": false,
+      "attachments": [],
+      "case_id": "bd8b0f28-a64f-49e3-b91f-5e419b755059",
+      "tags": [
+        "civil"
+      ]
+    },
+    {
+      "id": "9a195da6-11ef-4497-88c1-7a0951013ac9",
+      "folder": "sent",
+      "from": "john.smith@court.gov.uk",
+      "to": [
+        "solicitor@lawfirm.co.uk"
+      ],
+      "subject": "Re: Smith v. Johnson Property Dispute - Update",
+      "body": "Dear Solicitor,\n\nI wanted to update you on the Smith v. Johnson Property Dispute matter.\n\nPlease let me know if you need any additional information.\n\nBest regards,\nJohn Smith",
+      "date": "2025-07-27T19:20:08.780730+00:00",
+      "is_read": true,
+      "is_flagged": false,
+      "has_attachments": true,
+      "attachments": [
+        "document.pdf"
+      ],
+      "case_id": "bd8b0f28-a64f-49e3-b91f-5e419b755059",
+      "tags": [
+        "civil"
+      ]
+    },
+    {
+      "id": "dd28a46e-d187-42ba-a1e3-94749b5b8b3e",
+      "folder": "sent",
+      "from": "david.williams@client.com",
+      "to": [
+        "solicitor@lawfirm.co.uk"
+      ],
+      "subject": "Re: R v. Williams (Theft) - Update",
+      "body": "Dear Solicitor,\n\nI wanted to update you on the R v. Williams (Theft) matter.\n\nPlease let me know if you need any additional information.\n\nBest regards,\nDavid Williams",
+      "date": "2025-07-28T19:20:08.780744+00:00",
+      "is_read": true,
+      "is_flagged": false,
+      "has_attachments": false,
+      "attachments": [],
+      "case_id": "b943f30f-b73e-48ed-b013-893fae3f5a74",
+      "tags": [
+        "criminal"
+      ]
+    },
+    {
+      "id": "1ce180e9-e5de-4913-b08b-94a4a6323b29",
+      "folder": "drafts",
+      "from": "david.williams@lawfirm.co.uk",
+      "to": [
+        "solicitor@lawfirm.co.uk"
+      ],
+      "subject": "Re: R v. Williams (Theft) - Update",
+      "body": "Dear Solicitor,\n\nI wanted to update you on the R v. Williams (Theft) matter.\n\nPlease let me know if you need any additional information.\n\nBest regards,\nDavid Williams",
+      "date": "2025-07-19T19:20:08.780762+00:00",
+      "is_read": true,
+      "is_flagged": false,
+      "has_attachments": true,
+      "attachments": [],
+      "case_id": "b943f30f-b73e-48ed-b013-893fae3f5a74",
+      "tags": [
+        "criminal"
+      ]
+    },
+    {
+      "id": "8fd0552b-83d4-4eb5-a545-fb6c32380479",
+      "folder": "inbox",
+      "from": "sarah.brown@opposingcounsel.com",
+      "to": [
+        "solicitor@lawfirm.co.uk"
+      ],
+      "subject": "Re: Brown Divorce Proceedings - Update",
+      "body": "Dear Solicitor,\n\nI wanted to update you on the Brown Divorce Proceedings matter.\n\nPlease let me know if you need any additional information.\n\nBest regards,\nSarah Brown",
+      "date": "2025-07-19T19:20:08.780785+00:00",
+      "is_read": false,
+      "is_flagged": true,
+      "has_attachments": true,
+      "attachments": [],
+      "case_id": "6d337942-64f1-4a9a-b3af-4776e18c837a",
+      "tags": [
+        "family"
+      ]
+    },
+    {
+      "id": "0fe887e4-4ab4-4e57-a8cc-37e04b97827d",
+      "folder": "drafts",
+      "from": "sarah.brown@court.gov.uk",
+      "to": [
+        "solicitor@lawfirm.co.uk"
+      ],
+      "subject": "Re: Brown Divorce Proceedings - Update",
+      "body": "Dear Solicitor,\n\nI wanted to update you on the Brown Divorce Proceedings matter.\n\nPlease let me know if you need any additional information.\n\nBest regards,\nSarah Brown",
+      "date": "2025-07-25T19:20:08.780800+00:00",
+      "is_read": false,
+      "is_flagged": true,
+      "has_attachments": true,
+      "attachments": [],
+      "case_id": "6d337942-64f1-4a9a-b3af-4776e18c837a",
+      "tags": [
+        "family"
+      ]
+    },
+    {
+      "id": "88c5111b-397b-48ff-bf06-b0859f0f7fc1",
+      "folder": "sent",
+      "from": "techcorp.ltd@lawfirm.co.uk",
+      "to": [
+        "solicitor@lawfirm.co.uk"
+      ],
+      "subject": "Re: TechCorp Ltd Contract Review - Update",
+      "body": "Dear Solicitor,\n\nI wanted to update you on the TechCorp Ltd Contract Review matter.\n\nPlease let me know if you need any additional information.\n\nBest regards,\nTechCorp Ltd",
+      "date": "2025-07-27T19:20:08.780815+00:00",
+      "is_read": true,
+      "is_flagged": true,
+      "has_attachments": true,
+      "attachments": [],
+      "case_id": "9e5df894-184e-452d-a7a7-bf8ea6eec29b",
+      "tags": [
+        "corporate"
+      ]
+    },
+    {
+      "id": "21ef25e4-2298-4736-b7b7-bcbaf07f6487",
+      "folder": "drafts",
+      "from": "techcorp.ltd@court.gov.uk",
+      "to": [
+        "solicitor@lawfirm.co.uk"
+      ],
+      "subject": "Re: TechCorp Ltd Contract Review - Update",
+      "body": "Dear Solicitor,\n\nI wanted to update you on the TechCorp Ltd Contract Review matter.\n\nPlease let me know if you need any additional information.\n\nBest regards,\nTechCorp Ltd",
+      "date": "2025-07-31T19:20:08.780827+00:00",
+      "is_read": false,
+      "is_flagged": true,
+      "has_attachments": true,
+      "attachments": [
+        "document.pdf"
+      ],
+      "case_id": "9e5df894-184e-452d-a7a7-bf8ea6eec29b",
+      "tags": [
+        "corporate"
+      ]
+    },
+    {
+      "id": "da8547f1-1c4a-4f3b-8732-4e2ad9887371",
+      "folder": "inbox",
+      "from": "thompson.family@opposingcounsel.com",
+      "to": [
+        "solicitor@lawfirm.co.uk"
+      ],
+      "subject": "Re: Estate of Margaret Thompson - Update",
+      "body": "Dear Solicitor,\n\nI wanted to update you on the Estate of Margaret Thompson matter.\n\nPlease let me know if you need any additional information.\n\nBest regards,\nThompson Family",
+      "date": "2025-07-26T19:20:08.780841+00:00",
+      "is_read": false,
+      "is_flagged": false,
+      "has_attachments": true,
+      "attachments": [
+        "document.pdf"
+      ],
+      "case_id": "c78f371e-a634-437b-9035-79625c1d45a2",
+      "tags": [
+        "other"
+      ]
+    },
+    {
+      "id": "b655e739-8027-4454-9881-e55a61765aab",
+      "folder": "sent",
+      "from": "thompson.family@court.gov.uk",
+      "to": [
+        "solicitor@lawfirm.co.uk"
+      ],
+      "subject": "Re: Estate of Margaret Thompson - Update",
+      "body": "Dear Solicitor,\n\nI wanted to update you on the Estate of Margaret Thompson matter.\n\nPlease let me know if you need any additional information.\n\nBest regards,\nThompson Family",
+      "date": "2025-07-30T19:20:08.780857+00:00",
+      "is_read": true,
+      "is_flagged": false,
+      "has_attachments": true,
+      "attachments": [
+        "document.pdf"
+      ],
+      "case_id": "c78f371e-a634-437b-9035-79625c1d45a2",
+      "tags": [
+        "other"
+      ]
+    },
+    {
+      "id": "2fd35c6d-d099-40c7-8780-2801dc736668",
+      "folder": "inbox",
+      "from": "thompson.family@client.com",
+      "to": [
+        "solicitor@lawfirm.co.uk"
+      ],
+      "subject": "Re: Estate of Margaret Thompson - Update",
+      "body": "Dear Solicitor,\n\nI wanted to update you on the Estate of Margaret Thompson matter.\n\nPlease let me know if you need any additional information.\n\nBest regards,\nThompson Family",
+      "date": "2025-07-22T19:20:08.780870+00:00",
+      "is_read": true,
+      "is_flagged": true,
+      "has_attachments": false,
+      "attachments": [
+        "document.pdf"
+      ],
+      "case_id": "c78f371e-a634-437b-9035-79625c1d45a2",
+      "tags": [
+        "other"
+      ]
+    },
+    {
+      "id": "616ae44f-fed3-4847-b486-e7858aee27f8",
+      "folder": "sent",
+      "from": "thompson.family@opposingcounsel.com",
+      "to": [
+        "solicitor@lawfirm.co.uk"
+      ],
+      "subject": "Re: Estate of Margaret Thompson - Update",
+      "body": "Dear Solicitor,\n\nI wanted to update you on the Estate of Margaret Thompson matter.\n\nPlease let me know if you need any additional information.\n\nBest regards,\nThompson Family",
+      "date": "2025-07-29T19:20:08.780882+00:00",
+      "is_read": true,
+      "is_flagged": true,
+      "has_attachments": true,
+      "attachments": [],
+      "case_id": "c78f371e-a634-437b-9035-79625c1d45a2",
+      "tags": [
+        "other"
+      ]
+    }
+  ],
+  "folders": [
+    {
+      "name": "inbox",
+      "count": 4,
+      "unread": 3
+    },
+    {
+      "name": "sent",
+      "count": 5,
+      "unread": 0
+    },
+    {
+      "name": "drafts",
+      "count": 5,
+      "unread": 4
+    },
+    {
+      "name": "trash",
+      "count": 0,
+      "unread": 0
+    },
+    {
+      "name": "archive",
+      "count": 0,
+      "unread": 0
+    }
+  ]
+}

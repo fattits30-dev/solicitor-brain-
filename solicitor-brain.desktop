@@ -1,0 +1,11 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=Solicitor Brain
+Comment=On-premises UK law AI clerk for small firms
+Exec=/media/mine/AI-DEV/solicitor-brain/run_electron.sh
+Icon=/media/mine/AI-DEV/solicitor-brain/frontend/public/icon.png
+Terminal=false
+Categories=Office;Legal;
+Keywords=legal;law;solicitor;ai;practice;management;
+StartupNotify=true

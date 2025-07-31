@@ -1,14 +1,16 @@
-from typing import List, Dict, Optional, Tuple, Any, cast
-from datetime import datetime, timezone
-from uuid import UUID
 import logging
-from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select, and_
+from datetime import UTC, datetime
+from typing import Any, cast
+from uuid import UUID
 
-from backend.models.case_facts import Case, CaseFact, FactRelation
-from backend.utils.compliance import check_citation
-from backend.services.monitoring import record_hallucination_block, timed
+from sqlalchemy import and_, select
+from sqlalchemy.ext.asyncio import AsyncSession
+
 from backend.config import settings
+from backend.models.case import Case
+from backend.models.case_facts import CaseFact, FactRelation
+from backend.services.monitoring import record_hallucination_block, timed
+from backend.utils.compliance import check_citation
 
 logger = logging.getLogger(__name__)
 
@@ -25,15 +27,15 @@ class FactService:
         case_id: UUID,
         fact_text: str,
         fact_type: str,
-        source_document_id: Optional[UUID] = None,
-        source_page: Optional[str] = None,
-        source_text: Optional[str] = None,
-        citations: Optional[List[Dict[str, Any]]] = None,
+        source_document_id: UUID | None = None,
+        source_page: str | None = None,
+        source_text: str | None = None,
+        citations: list[dict[str, Any]] | None = None,
         extracted_by_ai: bool = False,
         importance: str = "medium",
-        category: Optional[str] = None,
-        tags: Optional[List[str]] = None,
-        user_id: Optional[str] = None,
+        category: str | None = None,
+        tags: list[str] | None = None,
+        user_id: str | None = None,
     ) -> CaseFact:
         """
         Save a fact with full verification and compliance checks
@@ -60,20 +62,20 @@ class FactService:
             source_text=source_text,
             extracted_by_ai=extracted_by_ai,
             extraction_model=settings.primary_model if extracted_by_ai else None,
-            extraction_timestamp=datetime.now(timezone.utc) if extracted_by_ai else None,
+            extraction_timestamp=datetime.now(UTC) if extracted_by_ai else None,
             citations=citations,
             importance=importance,
             category=category,
             tags=tags,
             verification_status="unverified" if extracted_by_ai else "verified",
             verified_by=user_id if not extracted_by_ai else None,
-            verified_at=datetime.now(timezone.utc) if not extracted_by_ai else None,
+            verified_at=datetime.now(UTC) if not extracted_by_ai else None,
             confidence_score=self._calculate_confidence(citations) if citations else 0.0,
         )
 
         # Parse date if it's a date-type fact
         if fact_type == "date":
-            setattr(fact, "fact_date", self._extract_date(fact_text))
+            fact.fact_date = self._extract_date(fact_text)  # type: ignore[assignment]
 
         self.db.add(fact)
 
@@ -88,7 +90,11 @@ class FactService:
 
     @timed
     async def verify_fact(
-        self, fact_id: UUID, verification_status: str, user_id: str, amendment_reason: Optional[str] = None
+        self,
+        fact_id: UUID,
+        verification_status: str,
+        user_id: str,
+        amendment_reason: str | None = None,
     ) -> CaseFact:
         """Verify or dispute a fact"""
         fact = await self.db.get(CaseFact, fact_id)
@@ -98,12 +104,12 @@ class FactService:
         if verification_status not in ["verified", "disputed"]:
             raise ValueError("Invalid verification status")
 
-        setattr(fact, "verification_status", verification_status)
-        setattr(fact, "verified_by", user_id)
-        setattr(fact, "verified_at", datetime.now(timezone.utc))
+        fact.verification_status = verification_status  # type: ignore[assignment]
+        fact.verified_by = user_id  # type: ignore[assignment]
+        fact.verified_at = datetime.now(UTC)  # type: ignore[assignment]
 
         if amendment_reason:
-            setattr(fact, "amendment_reason", amendment_reason)
+            fact.amendment_reason = amendment_reason  # type: ignore[assignment]
 
         await self.db.commit()
         await self.db.refresh(fact)
@@ -112,7 +118,11 @@ class FactService:
 
     @timed
     async def sign_off_fact(
-        self, fact_id: UUID, sign_off_status: str, user_id: str, amendment_reason: Optional[str] = None
+        self,
+        fact_id: UUID,
+        sign_off_status: str,
+        user_id: str,
+        amendment_reason: str | None = None,
     ) -> CaseFact:
         """Sign off on a fact (accept/amend/reject)"""
         fact = await self.db.get(CaseFact, fact_id)
@@ -122,12 +132,12 @@ class FactService:
         if sign_off_status not in ["accepted", "amended", "rejected"]:
             raise ValueError("Invalid sign-off status")
 
-        setattr(fact, "sign_off_status", sign_off_status)
-        setattr(fact, "sign_off_by", user_id)
-        setattr(fact, "sign_off_at", datetime.now(timezone.utc))
+        fact.sign_off_status = sign_off_status  # type: ignore[assignment]
+        fact.sign_off_by = user_id  # type: ignore[assignment]
+        fact.sign_off_at = datetime.now(UTC)  # type: ignore[assignment]
 
         if amendment_reason:
-            setattr(fact, "amendment_reason", amendment_reason)
+            fact.amendment_reason = amendment_reason  # type: ignore[assignment]
 
         await self.db.commit()
         await self.db.refresh(fact)
@@ -138,11 +148,11 @@ class FactService:
     async def get_case_facts(
         self,
         case_id: UUID,
-        fact_type: Optional[str] = None,
-        verification_status: Optional[str] = None,
-        importance: Optional[str] = None,
+        fact_type: str | None = None,
+        verification_status: str | None = None,
+        importance: str | None = None,
         include_rejected: bool = False,
-    ) -> List[CaseFact]:
+    ) -> list[CaseFact]:
         """Get all facts for a case with filtering"""
         query = select(CaseFact).where(CaseFact.case_id == case_id)
 
@@ -161,14 +171,14 @@ class FactService:
         query = query.order_by(CaseFact.created_at.desc())
 
         result = await self.db.execute(query)
-        facts: List[CaseFact] = list(result.scalars().all())
+        facts: list[CaseFact] = list(result.scalars().all())
         return facts
 
     @timed
-    async def find_conflicting_facts(self, case_id: UUID) -> List[Tuple[CaseFact, CaseFact]]:
+    async def find_conflicting_facts(self, case_id: UUID) -> list[tuple[CaseFact, CaseFact]]:
         """Find potentially conflicting facts in a case"""
         facts = await self.get_case_facts(case_id)
-        conflicts: List[Tuple[CaseFact, CaseFact]] = []
+        conflicts: list[tuple[CaseFact, CaseFact]] = []
 
         # Simple conflict detection - can be enhanced with NLP
         for i, fact1 in enumerate(facts):
@@ -179,7 +189,7 @@ class FactService:
         return conflicts
 
     @timed
-    async def get_critical_dates(self, case_id: UUID) -> List[CaseFact]:
+    async def get_critical_dates(self, case_id: UUID) -> list[CaseFact]:
         """Get all critical dates for a case"""
         query = (
             select(CaseFact)
@@ -195,15 +205,15 @@ class FactService:
         )
 
         result = await self.db.execute(query)
-        dates: List[CaseFact] = list(result.scalars().all())
+        dates: list[CaseFact] = list(result.scalars().all())
         return dates
 
     @timed
     async def bulk_extract_facts(
-        self, case_id: UUID, document_id: UUID, extracted_facts: List[Dict[str, Any]]
-    ) -> List[CaseFact]:
+        self, case_id: UUID, document_id: UUID, extracted_facts: list[dict[str, Any]]
+    ) -> list[CaseFact]:
         """Bulk save facts extracted from a document"""
-        saved_facts: List[CaseFact] = []
+        saved_facts: list[CaseFact] = []
 
         for fact_data in extracted_facts:
             # Each fact must have citations
@@ -232,15 +242,15 @@ class FactService:
 
         return saved_facts
 
-    def _calculate_confidence(self, citations: List[Dict[str, Any]]) -> float:
+    def _calculate_confidence(self, citations: list[dict[str, Any]]) -> float:
         """Calculate confidence score based on citations"""
         if not citations:
             return 0.0
 
-        confidences = [c.get("confidence", 0.0) for c in citations]
+        confidences: list[Any] = [c.get("confidence", 0.0) for c in citations]
         return sum(confidences) / len(confidences)
 
-    def _extract_date(self, text: str) -> Optional[datetime]:
+    def _extract_date(self, text: str) -> datetime | None:
         """Extract date from text - simplified version"""
         # In production, use dateutil or similar
         import re
@@ -291,8 +301,8 @@ class FactService:
     def _facts_may_conflict(self, fact1: CaseFact, fact2: CaseFact) -> bool:
         """Simple conflict detection - enhance with NLP"""
         # Use cast to tell the type checker these are instance values, not Column objects
-        type1 = cast(Optional[str], fact1.fact_type)
-        type2 = cast(Optional[str], fact2.fact_type)
+        type1 = cast("str | None", fact1.fact_type)
+        type2 = cast("str | None", fact2.fact_type)
 
         if type1 != type2:
             return False
@@ -300,10 +310,10 @@ class FactService:
         # Check for contradictory dates
         if type1 == "date":
             # Access the actual attribute values
-            date1 = cast(Optional[datetime], fact1.fact_date)
-            date2 = cast(Optional[datetime], fact2.fact_date)
-            cat1 = cast(Optional[str], fact1.category)
-            cat2 = cast(Optional[str], fact2.category)
+            date1 = cast("datetime | None", fact1.fact_date)
+            date2 = cast("datetime | None", fact2.fact_date)
+            cat1 = cast("str | None", fact1.category)
+            cat2 = cast("str | None", fact2.category)
 
             if date1 is not None and date2 is not None and cat1 == cat2 and date1 != date2:
                 return True
@@ -311,17 +321,17 @@ class FactService:
         # Check for contradictory parties
         if type1 == "party":
             # Simple text comparison - enhance with NLP
-            cat1 = cast(Optional[str], fact1.category)
-            cat2 = cast(Optional[str], fact2.category)
-            text1 = cast(str, fact1.fact_text)
-            text2 = cast(str, fact2.fact_text)
+            cat1 = cast("str | None", fact1.category)
+            cat2 = cast("str | None", fact2.category)
+            text1 = cast("str", fact1.fact_text)
+            text2 = cast("str", fact2.fact_text)
 
             if cat1 == cat2 and text1 != text2:
                 return True
 
         return False
 
-    def _determine_relation(self, fact1: CaseFact, fact2: CaseFact) -> Optional[str]:
+    def _determine_relation(self, fact1: CaseFact, fact2: CaseFact) -> str | None:
         """Determine relationship between facts"""
         if self._facts_may_conflict(fact1, fact2):
             return "contradicts"

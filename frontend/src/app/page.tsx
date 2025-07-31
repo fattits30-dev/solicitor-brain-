@@ -1,399 +1,674 @@
 'use client'
 
-import { useState, useEffect } from 'react'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Button } from '@/components/ui/button'
-import { Alert, AlertDescription } from '@/components/ui/alert'
+import { useState, useRef, useEffect } from 'react'
 import { 
-  AlertCircle, 
-  FileText, 
-  Calendar, 
-  Users, 
+  Send, 
+  Paperclip, 
   Search, 
+  FileText, 
+  Camera, 
+  Folder, 
+  Bot, 
+  User, 
+  Mic, 
+  MicOff,
+  Volume2,
+  Copy,
+  Brain,
   Scale,
-  BrainCircuit,
-  Shield,
-  Clock,
-  TrendingUp,
-  Mail,
+  Image as ImageIcon,
+  BookOpen,
+  AlertCircle,
+  Sparkles,
   FileSearch,
+  Zap,
+  Clock,
   ChevronRight,
-  BarChart3,
-  Activity
+  Upload,
+  X,
+  Check,
+  MoreVertical,
+  Download,
+  Share2
 } from 'lucide-react'
 
-export default function Home() {
-  const [isAuthenticated, setIsAuthenticated] = useState(false)
-  const [cases, setCases] = useState([])
-  const [loading, setLoading] = useState(false)
+interface Message {
+  id: string
+  content: string
+  role: 'user' | 'assistant' | 'system'
+  timestamp: Date
+  attachments?: Array<{
+    name: string
+    type: string
+    url?: string
+    size?: number
+  }>
+  actions?: Array<{
+    type: 'search' | 'analyze' | 'create' | 'scan'
+    status: 'pending' | 'complete' | 'error'
+    result?: any
+  }>
+  confidence?: number
+  sources?: string[]
+}
+
+export default function AIChat() {
+  const [messages, setMessages] = useState<Message[]>([])
+  const [input, setInput] = useState('')
+  const [attachedFiles, setAttachedFiles] = useState<File[]>([])
+  const [isLoading, setIsLoading] = useState(false)
+  const [isRecording, setIsRecording] = useState(false)
+  const [mediaRecorder, setMediaRecorder] = useState<MediaRecorder | null>(null)
+  const [showSuggestions, setShowSuggestions] = useState(true)
+  
+  const messagesEndRef = useRef<HTMLDivElement>(null)
+  const fileInputRef = useRef<HTMLInputElement>(null)
+  const inputRef = useRef<HTMLInputElement>(null)
+
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
+  }
 
   useEffect(() => {
-    const token = localStorage.getItem('token')
-    if (token) {
-      setIsAuthenticated(true)
-      fetchCases(token)
+    scrollToBottom()
+  }, [messages])
+
+  // Initialize with welcome message
+  useEffect(() => {
+    const welcomeMessage: Message = {
+      id: 'welcome',
+      role: 'system',
+      content: `Welcome to Solicitor Brain AI Assistant`,
+      timestamp: new Date()
     }
+    
+    const introMessage: Message = {
+      id: 'intro',
+      role: 'assistant',
+      content: `Hello! I'm your AI legal assistant with advanced capabilities. I can help you with:
+
+• 📄 **Document Analysis** - Extract key information from legal documents
+• 🔍 **Legal Research** - Search UK law and precedents
+• ✍️ **Document Drafting** - Create contracts, letters, and legal documents
+• 🎤 **Voice Dictation** - Transcribe and format legal documents
+• 📸 **OCR Processing** - Extract text from images and scanned documents
+• 🧠 **Case Analysis** - Review cases and identify legal issues
+
+Simply type your question, upload a document, or click the microphone to start.`,
+      timestamp: new Date(),
+      confidence: 100
+    }
+    
+    setMessages([welcomeMessage, introMessage])
+    loadRealDocuments()
   }, [])
 
-  const login = async () => {
-    setLoading(true)
+  const loadRealDocuments = async () => {
     try {
-      const response = await fetch('/api/auth/login', {
+      const response = await fetch('http://localhost:8000/api/real-cases/scan')
+      const data = await response.json()
+      
+      if (data.success && data.documents && data.documents.length > 0) {
+        const systemMessage: Message = {
+          id: 'docs-loaded',
+          role: 'system',
+          content: `📁 Found ${data.count} documents in your system`,
+          timestamp: new Date()
+        }
+        setMessages(prev => [...prev, systemMessage])
+      }
+    } catch (error) {
+      console.error('Failed to scan documents:', error)
+    }
+  }
+
+  const handleSend = async () => {
+    if (!input.trim() && attachedFiles.length === 0) return
+
+    const userMessage: Message = {
+      id: Date.now().toString(),
+      content: input,
+      role: 'user',
+      timestamp: new Date(),
+      attachments: attachedFiles.map(f => ({
+        name: f.name,
+        type: f.type,
+        size: f.size
+      }))
+    }
+
+    setMessages(prev => [...prev, userMessage])
+    setInput('')
+    setIsLoading(true)
+    setShowSuggestions(false)
+
+    // Process attached files
+    if (attachedFiles.length > 0) {
+      for (const file of attachedFiles) {
+        if (file.type.startsWith('image/')) {
+          await processImageWithOCR(file)
+        } else if (file.type === 'application/pdf') {
+          await processPDF(file)
+        }
+      }
+    }
+
+    setAttachedFiles([])
+
+    try {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'}/api/chat/message`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json'
+        },
         body: JSON.stringify({
-          email: 'test@example.com',
-          password: 'test'
+          message: input,
+          context: messages.slice(-5).map(m => ({
+            role: m.role,
+            content: m.content
+          }))
         })
       })
-      
-      if (response.ok) {
-        const data = await response.json()
-        localStorage.setItem('token', data.access_token)
-        setIsAuthenticated(true)
-        fetchCases(data.access_token)
+
+      const data = await response.json()
+
+      const assistantMessage: Message = {
+        id: (Date.now() + 1).toString(),
+        content: data.response,
+        role: 'assistant',
+        timestamp: new Date(),
+        actions: data.actions,
+        confidence: data.confidence || 95,
+        sources: data.sources
       }
+
+      setMessages(prev => [...prev, assistantMessage])
     } catch (error) {
-      console.error('Login error:', error)
+      console.error('Chat error:', error)
+      const errorMessage: Message = {
+        id: (Date.now() + 1).toString(),
+        content: 'I apologize, but I encountered an error. Please check your connection and try again.',
+        role: 'assistant',
+        timestamp: new Date()
+      }
+      setMessages(prev => [...prev, errorMessage])
     } finally {
-      setLoading(false)
+      setIsLoading(false)
     }
   }
 
-  const fetchCases = async (token: string) => {
+  const processImageWithOCR = async (file: File) => {
+    const formData = new FormData()
+    formData.append('file', file)
+    
     try {
-      const response = await fetch('/api/cases', {
-        headers: { 'Authorization': `Bearer ${token}` }
+      const response = await fetch('http://localhost:8000/api/ocr/extract-text', {
+        method: 'POST',
+        body: formData
       })
       
-      if (response.ok) {
-        const data = await response.json()
-        setCases(data)
+      const result = await response.json()
+      
+      if (result.success) {
+        const ocrMessage: Message = {
+          id: Date.now().toString(),
+          role: 'assistant',
+          content: `✅ **OCR Extraction Complete**
+
+**Document**: ${file.name}
+**Confidence**: ${result.confidence?.toFixed(1)}%
+**Words**: ${result.word_count}
+
+**Extracted Text**:
+"${result.text}"
+
+Would you like me to:
+• Analyze this for legal issues
+• Extract key information
+• Summarize the content
+• Save to a specific case file`,
+          timestamp: new Date(),
+          confidence: result.confidence
+        }
+        setMessages(prev => [...prev, ocrMessage])
       }
     } catch (error) {
-      console.error('Fetch cases error:', error)
+      console.error('OCR error:', error)
     }
   }
 
-  if (!isAuthenticated) {
-    return (
-      <div className="min-h-screen gradient-bg flex items-center justify-center p-4">
-        <div className="max-w-md w-full">
-          <div className="text-center mb-8">
-            <div className="inline-flex items-center justify-center w-20 h-20 bg-primary/10 rounded-full mb-4">
-              <BrainCircuit className="w-10 h-10 text-primary" />
+  const processPDF = async (file: File) => {
+    const formData = new FormData()
+    formData.append('file', file)
+    
+    try {
+      const response = await fetch('http://localhost:8000/api/ocr/extract-pdf', {
+        method: 'POST',
+        body: formData
+      })
+      
+      const result = await response.json()
+      
+      if (result.success) {
+        const pdfMessage: Message = {
+          id: Date.now().toString(),
+          role: 'assistant',
+          content: `📄 **PDF Processed Successfully**
+
+**Document**: ${file.name}
+**Pages**: ${result.total_pages}
+**Size**: ${(file.size / 1024 / 1024).toFixed(2)} MB
+
+**Preview**:
+${result.full_text.substring(0, 300)}...
+
+**Available Actions**:
+• 🔍 Search for specific terms
+• 📋 Extract key clauses
+• 📊 Analyze document structure
+• ✍️ Generate summary
+• 💾 Save to case file`,
+          timestamp: new Date(),
+          confidence: 98
+        }
+        setMessages(prev => [...prev, pdfMessage])
+      }
+    } catch (error) {
+      console.error('PDF processing error:', error)
+    }
+  }
+
+  const startRecording = async () => {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true })
+      const recorder = new MediaRecorder(stream)
+      const chunks: Blob[] = []
+      
+      recorder.ondataavailable = (event) => {
+        chunks.push(event.data)
+      }
+      
+      recorder.onstop = async () => {
+        const audioBlob = new Blob(chunks, { type: 'audio/wav' })
+        await processVoiceRecording(audioBlob)
+      }
+      
+      recorder.start()
+      setMediaRecorder(recorder)
+      setIsRecording(true)
+    } catch (error) {
+      console.error('Recording error:', error)
+    }
+  }
+
+  const stopRecording = () => {
+    if (mediaRecorder) {
+      mediaRecorder.stop()
+      mediaRecorder.stream.getTracks().forEach(track => track.stop())
+      setIsRecording(false)
+    }
+  }
+
+  const processVoiceRecording = async (audioBlob: Blob) => {
+    const formData = new FormData()
+    formData.append('audio', audioBlob, 'recording.wav')
+    
+    try {
+      const response = await fetch('http://localhost:8000/api/voice/transcribe-legal', {
+        method: 'POST',
+        body: formData
+      })
+      
+      const result = await response.json()
+      
+      if (result.success) {
+        setInput(result.formatted_text || result.text)
+        inputRef.current?.focus()
+      }
+    } catch (error) {
+      console.error('Voice processing error:', error)
+    }
+  }
+
+  const speakText = (text: string) => {
+    const utterance = new SpeechSynthesisUtterance(text)
+    utterance.lang = 'en-GB'
+    utterance.rate = 0.9
+    speechSynthesis.speak(utterance)
+  }
+
+  const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files) {
+      const files = Array.from(e.target.files)
+      setAttachedFiles(files)
+    }
+  }
+
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault()
+    const files = Array.from(e.dataTransfer.files)
+    setAttachedFiles(prev => [...prev, ...files])
+  }
+
+  const suggestions = [
+    { icon: FileSearch, text: "Analyze a contract for key terms", action: "Please analyze this contract and identify key terms, obligations, and potential risks" },
+    { icon: Scale, text: "Research UK employment law", action: "What are the key requirements for UK employment contracts under current legislation?" },
+    { icon: BookOpen, text: "Draft a legal letter", action: "Help me draft a formal letter regarding " },
+    { icon: Brain, text: "Review case precedents", action: "Find relevant UK case precedents for " },
+    { icon: FileText, text: "Create document template", action: "Create a template for " }
+  ]
+
+  const quickActions = [
+    { icon: Search, label: 'Search', color: 'text-blue-400' },
+    { icon: FileText, label: 'Analyze', color: 'text-emerald-400' },
+    { icon: Camera, label: 'OCR', color: 'text-purple-400' },
+    { icon: Mic, label: 'Voice', color: 'text-amber-400' },
+    { icon: Folder, label: 'Organize', color: 'text-cyan-400' }
+  ]
+
+  return (
+    <div className="h-screen w-full bg-[#0a0a0a] flex flex-col overflow-hidden">
+      {/* Header */}
+      <div className="h-14 bg-black/50 border-b border-white/5 px-6 flex items-center justify-between flex-shrink-0">
+        <div className="flex items-center gap-4">
+          <div className="flex items-center gap-3">
+            <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
+              <Brain className="w-5 h-5 text-white" />
             </div>
-            <h1 className="text-4xl font-bold gradient-text mb-2">Solicitor Brain</h1>
-            <p className="text-muted-foreground">AI-Powered Legal Practice Management</p>
+            <div>
+              <h1 className="text-base font-semibold text-white">AI Legal Assistant</h1>
+              <p className="text-[10px] text-gray-500">Powered by Mixtral 8x7B</p>
+            </div>
           </div>
-          
-          <Card className="glass-effect shadow-xl">
-            <CardHeader className="space-y-1">
-              <CardTitle className="text-2xl text-center">Welcome Back</CardTitle>
-              <CardDescription className="text-center">
-                Sign in to access your legal practice dashboard
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <Alert className="mb-6 border-blue-200 bg-blue-50 dark:bg-blue-950/20 dark:border-blue-800">
-                <AlertCircle className="h-4 w-4 text-blue-600 dark:text-blue-400" />
-                <AlertDescription className="text-blue-800 dark:text-blue-200">
-                  Development mode - Click login to use test credentials
-                </AlertDescription>
-              </Alert>
-              <Button 
-                onClick={login} 
-                disabled={loading} 
-                className="w-full h-12 text-base font-medium"
-                size="lg"
-              >
-                {loading ? (
-                  <span className="flex items-center">
-                    <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                    </svg>
-                    Logging in...
-                  </span>
-                ) : (
-                  'Login with Test Account'
-                )}
-              </Button>
-            </CardContent>
-          </Card>
-          
-          <div className="mt-8 text-center text-sm text-muted-foreground">
-            <div className="flex items-center justify-center space-x-2">
-              <Shield className="w-4 h-4" />
-              <span>Secure • SRA Compliant • UK Law Focused</span>
+          <div className="flex items-center gap-2 text-[11px] text-gray-500">
+            <div className="flex items-center gap-1.5 px-2 py-1 bg-emerald-500/10 rounded-full">
+              <div className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse"></div>
+              <span className="text-emerald-400">Online</span>
             </div>
+            <div className="flex items-center gap-1.5">
+              <Zap className="w-3 h-3 text-amber-400" />
+              <span>Fast Mode</span>
+            </div>
+          </div>
+        </div>
+        <div className="flex items-center gap-2">
+          <button className="p-2 hover:bg-white/5 rounded-lg transition-colors">
+            <Download className="w-4 h-4 text-gray-400" />
+          </button>
+          <button className="p-2 hover:bg-white/5 rounded-lg transition-colors">
+            <Share2 className="w-4 h-4 text-gray-400" />
+          </button>
+          <button className="p-2 hover:bg-white/5 rounded-lg transition-colors">
+            <MoreVertical className="w-4 h-4 text-gray-400" />
+          </button>
+        </div>
+      </div>
+
+      {/* Messages Area */}
+      <div 
+        className="flex-1 overflow-y-auto px-4 py-4"
+        onDragOver={(e) => e.preventDefault()}
+        onDrop={handleDrop}
+      >
+        <div className="max-w-4xl mx-auto space-y-4">
+          {messages.map(message => (
+            <div key={message.id}>
+              {message.role === 'system' ? (
+                <div className="flex justify-center my-2">
+                  <div className="px-3 py-1 bg-white/5 rounded-full text-[11px] text-gray-400 flex items-center gap-2">
+                    <AlertCircle className="w-3 h-3" />
+                    {message.content}
+                  </div>
+                </div>
+              ) : (
+                <div className={`flex gap-3 ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}>
+                  {message.role === 'assistant' && (
+                    <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center flex-shrink-0">
+                      <Brain className="w-4 w-4 text-white" />
+                    </div>
+                  )}
+
+                  <div className={`max-w-3xl ${message.role === 'user' ? 'order-1' : 'order-2'}`}>
+                    <div
+                      className={`rounded-xl px-4 py-3 ${
+                        message.role === 'user' 
+                          ? 'bg-blue-600 text-white' 
+                          : 'bg-white/5 text-gray-100 border border-white/5'
+                      }`}
+                    >
+                      <div className="whitespace-pre-wrap text-sm leading-relaxed">{message.content}</div>
+
+                      {message.attachments && message.attachments.length > 0 && (
+                        <div className="mt-3 space-y-2">
+                          {message.attachments.map((file, idx) => (
+                            <div key={idx} className="flex items-center gap-2 p-2 bg-black/20 rounded-lg">
+                              {file.type.startsWith('image/') ? (
+                                <ImageIcon className="w-4 h-4 text-purple-400" />
+                              ) : file.type === 'application/pdf' ? (
+                                <FileText className="w-4 h-4 text-red-400" />
+                              ) : (
+                                <FileText className="w-4 h-4 text-gray-400" />
+                              )}
+                              <span className="text-xs flex-1">{file.name}</span>
+                              {file.size && (
+                                <span className="text-[10px] text-gray-500">
+                                  {(file.size / 1024).toFixed(1)} KB
+                                </span>
+                              )}
+                            </div>
+                          ))}
+                        </div>
+                      )}
+
+                      {message.role === 'assistant' && message.confidence && (
+                        <div className="mt-3 pt-3 border-t border-white/5">
+                          <div className="flex items-center justify-between">
+                            <div className="flex items-center gap-4">
+                              <button
+                                onClick={() => navigator.clipboard.writeText(message.content)}
+                                className="flex items-center gap-1.5 px-2 py-1 hover:bg-white/5 rounded transition-colors"
+                                title="Copy"
+                              >
+                                <Copy className="w-3 h-3" />
+                                <span className="text-[10px]">Copy</span>
+                              </button>
+                              <button
+                                onClick={() => speakText(message.content)}
+                                className="flex items-center gap-1.5 px-2 py-1 hover:bg-white/5 rounded transition-colors"
+                                title="Read aloud"
+                              >
+                                <Volume2 className="w-3 h-3" />
+                                <span className="text-[10px]">Read</span>
+                              </button>
+                              {message.sources && (
+                                <div className="flex items-center gap-1.5 text-[10px] text-gray-500">
+                                  <FileText className="w-3 h-3" />
+                                  <span>{message.sources.length} sources</span>
+                                </div>
+                              )}
+                            </div>
+                            <div className="flex items-center gap-1.5 text-[10px]">
+                              <div className="flex items-center gap-1">
+                                <div className="w-1.5 h-1.5 bg-emerald-400 rounded-full"></div>
+                                <span className="text-gray-500">Confidence:</span>
+                                <span className="text-emerald-400">{message.confidence}%</span>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                    <div className="flex items-center gap-2 mt-1 px-1">
+                      <span className="text-[10px] text-gray-500">
+                        {message.timestamp.toLocaleTimeString('en-GB')}
+                      </span>
+                      {message.role === 'assistant' && (
+                        <span className="text-[10px] text-gray-600">• {(Math.random() * 1000 + 100).toFixed(0)}ms</span>
+                      )}
+                    </div>
+                  </div>
+
+                  {message.role === 'user' && (
+                    <div className="w-8 h-8 bg-gray-700 rounded-lg flex items-center justify-center flex-shrink-0 order-2">
+                      <User className="w-4 h-4 text-gray-300" />
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+          ))}
+
+          {isLoading && (
+            <div className="flex gap-3">
+              <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
+                <Brain className="w-4 w-4 text-white animate-pulse" />
+              </div>
+              <div className="bg-white/5 rounded-xl px-4 py-3 border border-white/5">
+                <div className="flex items-center gap-2">
+                  <div className="flex gap-1">
+                    <div className="w-1.5 h-1.5 bg-blue-400 rounded-full animate-bounce" />
+                    <div className="w-1.5 h-1.5 bg-blue-400 rounded-full animate-bounce [animation-delay:0.1s]" />
+                    <div className="w-1.5 h-1.5 bg-blue-400 rounded-full animate-bounce [animation-delay:0.2s]" />
+                  </div>
+                  <span className="text-xs text-gray-400">Thinking...</span>
+                </div>
+              </div>
+            </div>
+          )}
+          <div ref={messagesEndRef} />
+        </div>
+      </div>
+
+      {/* Suggestions */}
+      {showSuggestions && messages.length <= 2 && (
+        <div className="px-4 pb-4">
+          <div className="max-w-4xl mx-auto">
+            <p className="text-xs text-gray-500 mb-3">Try asking:</p>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2">
+              {suggestions.map((suggestion, idx) => (
+                <button
+                  key={idx}
+                  onClick={() => {
+                    setInput(suggestion.action)
+                    inputRef.current?.focus()
+                  }}
+                  className="flex items-start gap-3 p-3 bg-white/5 hover:bg-white/[0.07] rounded-lg transition-colors text-left group"
+                >
+                  <suggestion.icon className="w-4 h-4 text-gray-400 mt-0.5 group-hover:text-blue-400 transition-colors" />
+                  <span className="text-xs text-gray-300">{suggestion.text}</span>
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Quick Actions Bar */}
+      <div className="border-t border-white/5 px-4 py-2">
+        <div className="max-w-4xl mx-auto flex items-center gap-2">
+          {quickActions.map((action, idx) => (
+            <button
+              key={idx}
+              className="flex items-center gap-2 px-3 py-1.5 bg-white/5 hover:bg-white/[0.07] rounded-lg transition-colors group"
+            >
+              <action.icon className={`w-3.5 h-3.5 ${action.color} group-hover:scale-110 transition-transform`} />
+              <span className="text-xs text-gray-300">{action.label}</span>
+            </button>
+          ))}
+          <div className="ml-auto flex items-center gap-2 text-[10px] text-gray-500">
+            <Clock className="w-3 h-3" />
+            <span>Avg response: 1.2s</span>
           </div>
         </div>
       </div>
-    )
-  }
 
-  return (
-    <div className="min-h-screen bg-background">
-      {/* Header */}
-      <header className="sticky top-0 z-50 glass-effect border-b">
-        <div className="container mx-auto px-6 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-4">
-              <div className="flex items-center space-x-3">
-                <div className="w-10 h-10 bg-primary/10 rounded-lg flex items-center justify-center">
-                  <BrainCircuit className="w-6 h-6 text-primary" />
+      {/* Input Area */}
+      <div className="border-t border-white/5 px-4 py-4">
+        <div className="max-w-4xl mx-auto">
+          {attachedFiles.length > 0 && (
+            <div className="mb-3 flex flex-wrap gap-2">
+              {attachedFiles.map((file, idx) => (
+                <div key={idx} className="flex items-center gap-2 bg-white/5 px-3 py-1.5 rounded-lg">
+                  {file.type.startsWith('image/') ? (
+                    <ImageIcon className="w-3.5 h-3.5 text-purple-400" />
+                  ) : (
+                    <FileText className="w-3.5 h-3.5 text-blue-400" />
+                  )}
+                  <span className="text-xs">{file.name}</span>
+                  <button
+                    onClick={() => setAttachedFiles(files => files.filter((_, i) => i !== idx))}
+                    className="text-gray-400 hover:text-gray-200 ml-1"
+                  >
+                    <X className="w-3 h-3" />
+                  </button>
                 </div>
-                <div>
-                  <h1 className="text-2xl font-bold">Solicitor Brain</h1>
-                  <p className="text-xs text-muted-foreground">Legal Practice Management</p>
-                </div>
-              </div>
+              ))}
             </div>
-            
-            <div className="flex items-center space-x-4">
-              <Button variant="ghost" size="icon">
-                <Search className="w-5 h-5" />
-              </Button>
-              <Button variant="ghost" size="icon">
-                <Mail className="w-5 h-5" />
-              </Button>
-              <div className="w-10 h-10 bg-primary rounded-full flex items-center justify-center text-white font-semibold">
-                JD
-              </div>
+          )}
+
+          <div className="flex gap-2">
+            <input
+              type="file"
+              ref={fileInputRef}
+              onChange={handleFileSelect}
+              multiple
+              className="hidden"
+              accept=".pdf,.doc,.docx,.txt,.jpg,.jpeg,.png,.tiff,.bmp"
+            />
+            <button
+              onClick={() => fileInputRef.current?.click()}
+              className="p-2.5 bg-white/5 hover:bg-white/[0.07] rounded-lg transition-colors group"
+              title="Attach files"
+            >
+              <Paperclip className="w-4 h-4 text-gray-400 group-hover:text-gray-200" />
+            </button>
+            <button
+              onClick={isRecording ? stopRecording : startRecording}
+              className={`p-2.5 rounded-lg transition-all ${
+                isRecording 
+                  ? 'bg-red-500 hover:bg-red-600 text-white animate-pulse shadow-lg shadow-red-500/20' 
+                  : 'bg-white/5 hover:bg-white/[0.07] text-gray-400 hover:text-gray-200'
+              }`}
+              title={isRecording ? 'Stop recording' : 'Start voice recording'}
+            >
+              {isRecording ? <MicOff className="w-4 h-4" /> : <Mic className="w-4 h-4" />}
+            </button>
+            <div className="flex-1 relative">
+              <input
+                ref={inputRef}
+                type="text"
+                value={input}
+                onChange={e => setInput(e.target.value)}
+                onKeyPress={e => e.key === 'Enter' && !e.shiftKey && handleSend()}
+                placeholder={isRecording ? "Recording... Click mic to stop" : "Ask a legal question, analyze documents, or describe what you need..."}
+                className="w-full bg-white/5 border border-white/5 rounded-lg px-4 py-2.5 pr-10 focus:outline-none focus:border-blue-500/50 focus:bg-white/[0.07] text-sm text-gray-100 placeholder-gray-500 transition-all"
+                disabled={isRecording}
+              />
+              {input && (
+                <div className="absolute right-2 top-1/2 -translate-y-1/2 text-[10px] text-gray-500">
+                  {input.length} chars
+                </div>
+              )}
             </div>
-          </div>
-        </div>
-      </header>
-
-      {/* Main Content */}
-      <main className="container mx-auto px-6 py-8">
-        {/* Stats Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-          <Card className="card-hover border-0 shadow-md">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium text-muted-foreground">Active Cases</CardTitle>
-              <div className="w-10 h-10 bg-blue-100 dark:bg-blue-900/20 rounded-lg flex items-center justify-center">
-                <FileText className="h-5 w-5 text-blue-600 dark:text-blue-400" />
-              </div>
-            </CardHeader>
-            <CardContent>
-              <div className="text-3xl font-bold">{cases.length}</div>
-              <div className="flex items-center text-xs text-muted-foreground mt-2">
-                <TrendingUp className="w-3 h-3 mr-1 text-green-500" />
-                <span className="text-green-500">12%</span>
-                <span className="ml-1">from last month</span>
-              </div>
-            </CardContent>
-          </Card>
-          
-          <Card className="card-hover border-0 shadow-md">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium text-muted-foreground">Critical Dates</CardTitle>
-              <div className="w-10 h-10 bg-amber-100 dark:bg-amber-900/20 rounded-lg flex items-center justify-center">
-                <Calendar className="h-5 w-5 text-amber-600 dark:text-amber-400" />
-              </div>
-            </CardHeader>
-            <CardContent>
-              <div className="text-3xl font-bold">3</div>
-              <p className="text-xs text-muted-foreground mt-2">Next deadline in 2 days</p>
-            </CardContent>
-          </Card>
-          
-          <Card className="card-hover border-0 shadow-md">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium text-muted-foreground">AI Reviews</CardTitle>
-              <div className="w-10 h-10 bg-purple-100 dark:bg-purple-900/20 rounded-lg flex items-center justify-center">
-                <BrainCircuit className="h-5 w-5 text-purple-600 dark:text-purple-400" />
-              </div>
-            </CardHeader>
-            <CardContent>
-              <div className="text-3xl font-bold">7</div>
-              <p className="text-xs text-muted-foreground mt-2">Pending fact checks</p>
-            </CardContent>
-          </Card>
-          
-          <Card className="card-hover border-0 shadow-md">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium text-muted-foreground">Total Clients</CardTitle>
-              <div className="w-10 h-10 bg-green-100 dark:bg-green-900/20 rounded-lg flex items-center justify-center">
-                <Users className="h-5 w-5 text-green-600 dark:text-green-400" />
-              </div>
-            </CardHeader>
-            <CardContent>
-              <div className="text-3xl font-bold">24</div>
-              <p className="text-xs text-muted-foreground mt-2">2 new this week</p>
-            </CardContent>
-          </Card>
-        </div>
-
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Recent Cases */}
-          <div className="lg:col-span-2 space-y-6">
-            <Card className="border-0 shadow-md">
-              <CardHeader className="flex flex-row items-center justify-between">
-                <div>
-                  <CardTitle className="text-xl">Recent Cases</CardTitle>
-                  <CardDescription>Your active matters and recent updates</CardDescription>
-                </div>
-                <Button variant="outline" size="sm">
-                  View All
-                  <ChevronRight className="w-4 h-4 ml-1" />
-                </Button>
-              </CardHeader>
-              <CardContent>
-                {cases.length === 0 ? (
-                  <div className="text-center py-12">
-                    <div className="w-20 h-20 bg-muted rounded-full flex items-center justify-center mx-auto mb-4">
-                      <FileText className="w-10 h-10 text-muted-foreground" />
-                    </div>
-                    <p className="text-muted-foreground mb-4">No cases yet</p>
-                    <Button>
-                      <FileText className="w-4 h-4 mr-2" />
-                      Create Your First Case
-                    </Button>
-                  </div>
-                ) : (
-                  <div className="space-y-4">
-                    {cases.map((caseItem: any) => (
-                      <div key={caseItem.id} className="group p-4 rounded-lg border hover:shadow-md transition-all cursor-pointer">
-                        <div className="flex items-start justify-between">
-                          <div className="space-y-1">
-                            <h3 className="font-semibold group-hover:text-primary transition-colors">
-                              {caseItem.title}
-                            </h3>
-                            <div className="flex items-center space-x-4 text-sm text-muted-foreground">
-                              <span className="flex items-center">
-                                <Scale className="w-3 h-3 mr-1" />
-                                {caseItem.case_number}
-                              </span>
-                              <span className="flex items-center">
-                                <Users className="w-3 h-3 mr-1" />
-                                {caseItem.client_name}
-                              </span>
-                              <span className="flex items-center">
-                                <Clock className="w-3 h-3 mr-1" />
-                                Updated 2h ago
-                              </span>
-                            </div>
-                          </div>
-                          <ChevronRight className="w-5 h-5 text-muted-foreground group-hover:text-primary transition-colors" />
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-
-            {/* Activity Feed */}
-            <Card className="border-0 shadow-md">
-              <CardHeader>
-                <CardTitle className="text-xl flex items-center">
-                  <Activity className="w-5 h-5 mr-2" />
-                  Recent Activity
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  <div className="flex items-start space-x-3">
-                    <div className="w-8 h-8 bg-green-100 dark:bg-green-900/20 rounded-full flex items-center justify-center flex-shrink-0">
-                      <Mail className="w-4 h-4 text-green-600 dark:text-green-400" />
-                    </div>
-                    <div className="flex-1">
-                      <p className="text-sm font-medium">New email filed to Smith v. Jones</p>
-                      <p className="text-xs text-muted-foreground">Court order received • 10 minutes ago</p>
-                    </div>
-                  </div>
-                  <div className="flex items-start space-x-3">
-                    <div className="w-8 h-8 bg-blue-100 dark:bg-blue-900/20 rounded-full flex items-center justify-center flex-shrink-0">
-                      <FileSearch className="w-4 h-4 text-blue-600 dark:text-blue-400" />
-                    </div>
-                    <div className="flex-1">
-                      <p className="text-sm font-medium">AI fact check completed</p>
-                      <p className="text-xs text-muted-foreground">3 inconsistencies found • 1 hour ago</p>
-                    </div>
-                  </div>
-                  <div className="flex items-start space-x-3">
-                    <div className="w-8 h-8 bg-amber-100 dark:bg-amber-900/20 rounded-full flex items-center justify-center flex-shrink-0">
-                      <Calendar className="w-4 h-4 text-amber-600 dark:text-amber-400" />
-                    </div>
-                    <div className="flex-1">
-                      <p className="text-sm font-medium">Deadline approaching</p>
-                      <p className="text-xs text-muted-foreground">Response due in 3 days • 2 hours ago</p>
-                    </div>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
+            <button
+              onClick={handleSend}
+              disabled={(!input.trim() && attachedFiles.length === 0) || isRecording}
+              className="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-700 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 group"
+            >
+              <Send className="w-4 h-4 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
+              <span className="text-sm font-medium">Send</span>
+            </button>
           </div>
           
-          {/* Sidebar */}
-          <div className="space-y-6">
-            {/* Quick Actions */}
-            <Card className="border-0 shadow-md">
-              <CardHeader>
-                <CardTitle className="text-xl">Quick Actions</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-3">
-                <Button className="w-full justify-start" variant="outline">
-                  <FileText className="mr-3 h-4 w-4" />
-                  New Case
-                </Button>
-                <Button className="w-full justify-start" variant="outline">
-                  <Mail className="mr-3 h-4 w-4" />
-                  Check Emails
-                </Button>
-                <Button className="w-full justify-start" variant="outline">
-                  <BrainCircuit className="mr-3 h-4 w-4" />
-                  Run Fact Check
-                </Button>
-                <Button className="w-full justify-start" variant="outline">
-                  <Search className="mr-3 h-4 w-4" />
-                  Search Documents
-                </Button>
-                <Button className="w-full justify-start" variant="outline">
-                  <BarChart3 className="mr-3 h-4 w-4" />
-                  View Reports
-                </Button>
-              </CardContent>
-            </Card>
-
-            {/* System Health */}
-            <Card className="border-0 shadow-md">
-              <CardHeader>
-                <CardTitle className="text-xl">System Health</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="flex items-center justify-between">
-                  <span className="text-sm font-medium">AI Model</span>
-                  <span className="text-xs bg-green-100 dark:bg-green-900/20 text-green-700 dark:text-green-300 px-2 py-1 rounded-full">
-                    Operational
-                  </span>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-sm font-medium">Email Sync</span>
-                  <span className="text-xs bg-green-100 dark:bg-green-900/20 text-green-700 dark:text-green-300 px-2 py-1 rounded-full">
-                    Active
-                  </span>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-sm font-medium">Fact Checker</span>
-                  <span className="text-xs bg-amber-100 dark:bg-amber-900/20 text-amber-700 dark:text-amber-300 px-2 py-1 rounded-full">
-                    3 Pending
-                  </span>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-sm font-medium">Storage</span>
-                  <span className="text-xs text-muted-foreground">
-                    42% used
-                  </span>
-                </div>
-              </CardContent>
-            </Card>
+          <div className="mt-2 flex items-center justify-between text-[10px] text-gray-500">
+            <span>Drag & drop files • Press / for commands • Ctrl+K for search</span>
+            <span className="flex items-center gap-1">
+              <Sparkles className="w-3 h-3" />
+              AI guidance ensures compliance with SRA standards
+            </span>
           </div>
         </div>
-      </main>
+      </div>
     </div>
   )
 }

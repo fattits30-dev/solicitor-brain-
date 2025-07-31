@@ -1,0 +1,47 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        body { font-family: Arial, sans-serif; line-height: 1.6; }
+        .court-header { border: 2px solid black; padding: 10px; margin-bottom: 20px; }
+        .statement { margin: 20px 0; }
+        .paragraph { margin: 10px 0; }
+        .truth-statement { margin-top: 30px; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <div class="court-header">
+        <p style="text-align: right;">Case No: {{ case_number }}</p>
+        <p style="text-align: center;">
+            IN THE {{ court_name }}<br>
+            {{ court_division }}
+        </p>
+        <p>BETWEEN:</p>
+        <p style="text-align: center;">{{ claimant_name }}<br>Claimant</p>
+        <p style="text-align: center;">-and-</p>
+        <p style="text-align: center;">{{ defendant_name }}<br>Defendant</p>
+    </div>
+    
+    <h1 style="text-align: center;">WITNESS STATEMENT OF {{ witness_name }}</h1>
+    
+    <div class="statement">
+        <p class="paragraph">1. I, {{ witness_name }}, of {{ witness_address }}, {{ witness_occupation }}, make this statement in support of the {{ party_supporting }}.</p>
+        
+        <p class="paragraph">2. The facts and matters set out in this statement are within my own knowledge unless otherwise stated, and I believe them to be true.</p>
+        
+        <p class="paragraph">3. {{ statement_content }}</p>
+    </div>
+    
+    <div class="truth-statement">
+        <p>I believe that the facts stated in this witness statement are true. I understand that proceedings for contempt of court may be brought against anyone who makes, or causes to be made, a false statement in a document verified by a statement of truth without an honest belief in its truth.</p>
+    </div>
+    
+    <div style="margin-top: 50px;">
+        <p>Signed: _______________________</p>
+        <p>{{ witness_name }}</p>
+        <p>Dated: {{ date }}</p>
+    </div>
+</body>
+</html>
+            

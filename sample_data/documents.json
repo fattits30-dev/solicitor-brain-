@@ -1,0 +1,290 @@
+[
+  {
+    "id": "ad7e8716-1967-43e7-b42f-d1a50088c09a",
+    "name": "NDA - CV-2025-7420.pdf",
+    "type": "PDF",
+    "size": 1841109,
+    "category": "contract",
+    "folder": "contract",
+    "caseId": "bd8b0f28-a64f-49e3-b91f-5e419b755059",
+    "uploadedBy": "System",
+    "uploadedAt": "2025-07-23T19:20:08.780333+00:00",
+    "lastModified": "2025-07-31T19:20:08.780342+00:00",
+    "tags": [
+      "contract"
+    ],
+    "status": "ready"
+  },
+  {
+    "id": "0a37b645-dcd2-4348-8054-fe46ab3a842f",
+    "name": "Meeting Notes - CV-2025-7420.docx",
+    "type": "DOCX",
+    "size": 2755993,
+    "category": "general",
+    "folder": "general",
+    "caseId": "bd8b0f28-a64f-49e3-b91f-5e419b755059",
+    "uploadedBy": "System",
+    "uploadedAt": "2025-07-11T19:20:08.780360+00:00",
+    "lastModified": "2025-07-31T19:20:08.780364+00:00",
+    "tags": [
+      "general"
+    ],
+    "status": "ready"
+  },
+  {
+    "id": "58c24b12-c145-4d7c-941e-6a19e77f4a8c",
+    "name": "Meeting Notes - CV-2025-7420.xlsx",
+    "type": "XLSX",
+    "size": 3299293,
+    "category": "general",
+    "folder": "general",
+    "caseId": "bd8b0f28-a64f-49e3-b91f-5e419b755059",
+    "uploadedBy": "System",
+    "uploadedAt": "2025-07-08T19:20:08.780382+00:00",
+    "lastModified": "2025-07-31T19:20:08.780396+00:00",
+    "tags": [
+      "general"
+    ],
+    "status": "ready"
+  },
+  {
+    "id": "69ce3fe7-c196-488a-b494-af8d71a510c8",
+    "name": "Timeline - CR-2025-9964.pdf",
+    "type": "PDF",
+    "size": 4356512,
+    "category": "general",
+    "folder": "general",
+    "caseId": "b943f30f-b73e-48ed-b013-893fae3f5a74",
+    "uploadedBy": "System",
+    "uploadedAt": "2025-07-03T19:20:08.780417+00:00",
+    "lastModified": "2025-07-28T19:20:08.780422+00:00",
+    "tags": [
+      "general"
+    ],
+    "status": "ready"
+  },
+  {
+    "id": "916ed629-957c-44d0-b7be-48e3f01ffa75",
+    "name": "Photo Evidence - CR-2025-9964.pdf",
+    "type": "PDF",
+    "size": 1859029,
+    "category": "evidence",
+    "folder": "evidence",
+    "caseId": "b943f30f-b73e-48ed-b013-893fae3f5a74",
+    "uploadedBy": "System",
+    "uploadedAt": "2025-07-11T19:20:08.780440+00:00",
+    "lastModified": "2025-07-30T19:20:08.780445+00:00",
+    "tags": [
+      "evidence"
+    ],
+    "status": "ready"
+  },
+  {
+    "id": "c0fdf9af-f519-4d92-a694-9c9ac347b8d9",
+    "name": "Client Letter - CR-2025-9964.msg",
+    "type": "MSG",
+    "size": 190400,
+    "category": "correspondence",
+    "folder": "correspondence",
+    "caseId": "b943f30f-b73e-48ed-b013-893fae3f5a74",
+    "uploadedBy": "System",
+    "uploadedAt": "2025-07-24T19:20:08.780459+00:00",
+    "lastModified": "2025-07-26T19:20:08.780463+00:00",
+    "tags": [
+      "correspondence"
+    ],
+    "status": "ready"
+  },
+  {
+    "id": "100ce7c3-9798-4525-b8f2-8efc8cc6da2d",
+    "name": "Photo Evidence - CR-2025-9964.jpg",
+    "type": "JPG",
+    "size": 1468574,
+    "category": "evidence",
+    "folder": "evidence",
+    "caseId": "b943f30f-b73e-48ed-b013-893fae3f5a74",
+    "uploadedBy": "System",
+    "uploadedAt": "2025-07-20T19:20:08.780483+00:00",
+    "lastModified": "2025-07-27T19:20:08.780488+00:00",
+    "tags": [
+      "evidence"
+    ],
+    "status": "ready"
+  },
+  {
+    "id": "96f5b6d2-1bd5-4744-9480-f470bcd01124",
+    "name": "Motion to Dismiss - CR-2025-9964.pdf",
+    "type": "PDF",
+    "size": 2306304,
+    "category": "court_filing",
+    "folder": "court_filing",
+    "caseId": "b943f30f-b73e-48ed-b013-893fae3f5a74",
+    "uploadedBy": "System",
+    "uploadedAt": "2025-07-03T19:20:08.780503+00:00",
+    "lastModified": "2025-07-31T19:20:08.780507+00:00",
+    "tags": [
+      "court_filing"
+    ],
+    "status": "ready"
+  },
+  {
+    "id": "bcf3d6ae-a994-4c66-99b1-d0cc196cd851",
+    "name": "Meeting Notes - FM-2025-7413.docx",
+    "type": "DOCX",
+    "size": 139467,
+    "category": "general",
+    "folder": "general",
+    "caseId": "6d337942-64f1-4a9a-b3af-4776e18c837a",
+    "uploadedBy": "System",
+    "uploadedAt": "2025-07-18T19:20:08.780521+00:00",
+    "lastModified": "2025-07-27T19:20:08.780525+00:00",
+    "tags": [
+      "general"
+    ],
+    "status": "ready"
+  },
+  {
+    "id": "9bf197df-ae92-4884-bd1b-f2e323b67639",
+    "name": "License Agreement - FM-2025-7413.pdf",
+    "type": "PDF",
+    "size": 2305692,
+    "category": "contract",
+    "folder": "contract",
+    "caseId": "6d337942-64f1-4a9a-b3af-4776e18c837a",
+    "uploadedBy": "System",
+    "uploadedAt": "2025-07-06T19:20:08.780536+00:00",
+    "lastModified": "2025-07-25T19:20:08.780540+00:00",
+    "tags": [
+      "contract"
+    ],
+    "status": "ready"
+  },
+  {
+    "id": "339630ab-c024-4ea8-9116-3117c11e04f6",
+    "name": "Motion to Dismiss - FM-2025-7413.pdf",
+    "type": "PDF",
+    "size": 1438510,
+    "category": "court_filing",
+    "folder": "court_filing",
+    "caseId": "6d337942-64f1-4a9a-b3af-4776e18c837a",
+    "uploadedBy": "System",
+    "uploadedAt": "2025-07-21T19:20:08.780551+00:00",
+    "lastModified": "2025-07-26T19:20:08.780554+00:00",
+    "tags": [
+      "court_filing"
+    ],
+    "status": "ready"
+  },
+  {
+    "id": "4b1f922c-e447-427c-83d5-9c9eb223d627",
+    "name": "Court Notice - CO-2025-5035.pdf",
+    "type": "PDF",
+    "size": 4652132,
+    "category": "correspondence",
+    "folder": "correspondence",
+    "caseId": "9e5df894-184e-452d-a7a7-bf8ea6eec29b",
+    "uploadedBy": "System",
+    "uploadedAt": "2025-07-15T19:20:08.780566+00:00",
+    "lastModified": "2025-07-29T19:20:08.780570+00:00",
+    "tags": [
+      "correspondence"
+    ],
+    "status": "ready"
+  },
+  {
+    "id": "faf67539-6b6b-421b-866c-3dcd5e1cfe5d",
+    "name": "Photo Evidence - CO-2025-5035.png",
+    "type": "PNG",
+    "size": 1981232,
+    "category": "evidence",
+    "folder": "evidence",
+    "caseId": "9e5df894-184e-452d-a7a7-bf8ea6eec29b",
+    "uploadedBy": "System",
+    "uploadedAt": "2025-07-05T19:20:08.780580+00:00",
+    "lastModified": "2025-07-31T19:20:08.780583+00:00",
+    "tags": [
+      "evidence"
+    ],
+    "status": "ready"
+  },
+  {
+    "id": "f8f488cc-e04d-4c6e-8b3f-b45c7ef56a73",
+    "name": "Screenshot - CO-2025-5035.jpg",
+    "type": "JPG",
+    "size": 4858231,
+    "category": "evidence",
+    "folder": "evidence",
+    "caseId": "9e5df894-184e-452d-a7a7-bf8ea6eec29b",
+    "uploadedBy": "System",
+    "uploadedAt": "2025-07-03T19:20:08.780598+00:00",
+    "lastModified": "2025-07-28T19:20:08.780602+00:00",
+    "tags": [
+      "evidence"
+    ],
+    "status": "ready"
+  },
+  {
+    "id": "7fc8dfe7-f593-4832-948d-1b7fea744f91",
+    "name": "Motion to Dismiss - CO-2025-5035.pdf",
+    "type": "PDF",
+    "size": 691469,
+    "category": "court_filing",
+    "folder": "court_filing",
+    "caseId": "9e5df894-184e-452d-a7a7-bf8ea6eec29b",
+    "uploadedBy": "System",
+    "uploadedAt": "2025-07-22T19:20:08.780612+00:00",
+    "lastModified": "2025-07-30T19:20:08.780616+00:00",
+    "tags": [
+      "court_filing"
+    ],
+    "status": "ready"
+  },
+  {
+    "id": "d0bcf9fe-771b-4b53-9f0c-241cd01b5aa4",
+    "name": "NDA - PR-2025-4318.pdf",
+    "type": "PDF",
+    "size": 2067455,
+    "category": "contract",
+    "folder": "contract",
+    "caseId": "c78f371e-a634-437b-9035-79625c1d45a2",
+    "uploadedBy": "System",
+    "uploadedAt": "2025-07-15T19:20:08.780627+00:00",
+    "lastModified": "2025-07-28T19:20:08.780631+00:00",
+    "tags": [
+      "contract"
+    ],
+    "status": "ready"
+  },
+  {
+    "id": "c68d72e2-aaf3-47e8-ad3f-afc9c064db2f",
+    "name": "Screenshot - PR-2025-4318.png",
+    "type": "PNG",
+    "size": 154837,
+    "category": "evidence",
+    "folder": "evidence",
+    "caseId": "c78f371e-a634-437b-9035-79625c1d45a2",
+    "uploadedBy": "System",
+    "uploadedAt": "2025-07-09T19:20:08.780645+00:00",
+    "lastModified": "2025-07-26T19:20:08.780649+00:00",
+    "tags": [
+      "evidence"
+    ],
+    "status": "ready"
+  },
+  {
+    "id": "9e18581b-22c9-4777-913b-4d56a65232ec",
+    "name": "Document Scan - PR-2025-4318.jpg",
+    "type": "JPG",
+    "size": 2453189,
+    "category": "evidence",
+    "folder": "evidence",
+    "caseId": "c78f371e-a634-437b-9035-79625c1d45a2",
+    "uploadedBy": "System",
+    "uploadedAt": "2025-07-26T19:20:08.780659+00:00",
+    "lastModified": "2025-07-24T19:20:08.780663+00:00",
+    "tags": [
+      "evidence"
+    ],
+    "status": "ready"
+  }
+]

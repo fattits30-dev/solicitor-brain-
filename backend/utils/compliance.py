@@ -1,14 +1,19 @@
-from fastapi import Request, Response
-from starlette.middleware.base import BaseHTTPMiddleware, RequestResponseEndpoint
-from typing import List, Dict, Any
-import time
+import hashlib
 import json
 import logging
-from datetime import datetime, timezone
-import hashlib
+import time
+from datetime import UTC, datetime
+from typing import Any
+
+from fastapi import Request, Response
+from starlette.middleware.base import BaseHTTPMiddleware, RequestResponseEndpoint
 
 from backend.config import settings
-from backend.services.monitoring import record_request_duration, record_citation_check, record_sign_off
+from backend.services.monitoring import (
+    record_citation_check,
+    record_request_duration,
+    record_sign_off,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -27,15 +32,18 @@ class ComplianceMiddleware(BaseHTTPMiddleware):
 
         # Record metrics
         record_request_duration(
-            method=request.method, endpoint=request.url.path, status=response.status_code, duration=duration
+            method=request.method,
+            endpoint=request.url.path,
+            status=response.status_code,
+            duration=duration,
         )
 
         return response
 
     async def _log_request(self, request: Request, response: Response, duration: float) -> None:
         # Create immutable audit log entry
-        log_entry: Dict[str, Any] = {
-            "timestamp": datetime.now(timezone.utc).isoformat(),
+        log_entry: dict[str, Any] = {
+            "timestamp": datetime.now(UTC).isoformat(),
             "method": request.method,
             "path": request.url.path,
             "status": response.status_code,
@@ -51,7 +59,7 @@ class ComplianceMiddleware(BaseHTTPMiddleware):
         logger.info(f"AUDIT: {json.dumps(log_entry)}")
 
 
-def check_citation(text: str, citations: List[Dict[str, Any]]) -> bool:
+def check_citation(text: str, citations: list[dict[str, Any]]) -> bool:
     if not settings.citation_required:
         return True
 
@@ -81,7 +89,7 @@ def check_citation(text: str, citations: List[Dict[str, Any]]) -> bool:
 
 
 def validate_sign_off(document_id: str, status: str, user_id: str) -> bool:
-    valid_statuses = ["suggested", "accepted", "amended", "rejected"]
+    valid_statuses: list[Any] = ["suggested", "accepted", "amended", "rejected"]
 
     if status not in valid_statuses:
         logger.error(f"Invalid sign-off status: {status}")

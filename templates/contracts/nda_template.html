@@ -1,0 +1,69 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        body { font-family: 'Times New Roman', serif; line-height: 1.8; }
+        h1 { text-align: center; text-transform: uppercase; }
+        .clause { margin: 20px 0; }
+        .sub-clause { margin-left: 20px; }
+        .signature-block { margin-top: 50px; display: flex; justify-content: space-between; }
+    </style>
+</head>
+<body>
+    <h1>Non-Disclosure Agreement</h1>
+    
+    <p>This Agreement is entered into on {{ date }} between:</p>
+    
+    <div class="clause">
+        <p>(1) <strong>{{ party1_name }}</strong> of {{ party1_address }} ("Disclosing Party"); and</p>
+        <p>(2) <strong>{{ party2_name }}</strong> of {{ party2_address }} ("Receiving Party").</p>
+    </div>
+    
+    <h2>WHEREAS:</h2>
+    <p>The Disclosing Party wishes to disclose certain confidential information to the Receiving Party for the purpose of {{ purpose }}.</p>
+    
+    <h2>NOW THEREFORE, the parties agree as follows:</h2>
+    
+    <div class="clause">
+        <h3>1. Definition of Confidential Information</h3>
+        <p>"Confidential Information" means {{ confidential_info_definition }}</p>
+    </div>
+    
+    <div class="clause">
+        <h3>2. Obligations of Receiving Party</h3>
+        <p>The Receiving Party agrees to:</p>
+        <div class="sub-clause">
+            <p>(a) maintain the confidentiality of the Confidential Information;</p>
+            <p>(b) not disclose the Confidential Information to any third parties;</p>
+            <p>(c) use the Confidential Information solely for the Purpose.</p>
+        </div>
+    </div>
+    
+    <div class="clause">
+        <h3>3. Term</h3>
+        <p>This Agreement shall remain in effect for {{ term_years }} years from the date first written above.</p>
+    </div>
+    
+    <div class="clause">
+        <h3>4. Governing Law</h3>
+        <p>This Agreement shall be governed by the laws of England and Wales.</p>
+    </div>
+    
+    <div class="signature-block">
+        <div>
+            <p>_______________________<br>
+            {{ party1_signatory }}<br>
+            For and on behalf of<br>
+            {{ party1_name }}</p>
+        </div>
+        <div>
+            <p>_______________________<br>
+            {{ party2_signatory }}<br>
+            For and on behalf of<br>
+            {{ party2_name }}</p>
+        </div>
+    </div>
+</body>
+</html>
+            
